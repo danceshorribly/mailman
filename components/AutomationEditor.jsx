@@ -15,6 +15,7 @@ import {
 	setAutomationStatus,
 } from "@/app/(app)/automations/actions";
 import HeaderPage from "@/components/HeaderPage";
+import DialogEmailTemplate from "@/components/DialogEmailTemplate";
 import RuleBuilder, { FieldSelect, newRule } from "@/components/RuleBuilder";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -48,6 +49,7 @@ export default function AutomationEditor({
 	const [selected, setSelected] = useState(flow.definition.start);
 	const [result, setResult] = useState(null);
 	const [dirty, setDirty] = useState(false);
+	const [previousEmail, setPreviousEmail] = useState(null);
 	const [pending, start] = useTransition();
 	const editable = flow.status !== "active";
 	const node = draft.definition.nodes.find((item) => item.id === selected);
@@ -351,6 +353,27 @@ export default function AutomationEditor({
 							)}
 							{node.type === "email" && (
 								<>
+									<div className="flex flex-wrap gap-2">
+										<DialogEmailTemplate
+											trigger={draft.trigger}
+											newsletter={newsletter}
+											disabled={!editable}
+											onApply={(template) => {
+												setPreviousEmail({
+													id: node.id, subject: node.subject,
+													previewText: node.previewText,
+													format: node.format || "markdown",
+													html: node.html || "", markdown: node.markdown || "",
+												});
+												updateNode({ subject: template.subject, previewText: template.previewText, format: "html", html: template.html });
+											}}
+										/>
+										{previousEmail?.id === node.id && (
+											<Button type="button" variant="ghost" onClick={() => { updateNode(previousEmail); setPreviousEmail(null); }}>
+												Undo template
+											</Button>
+										)}
+									</div>
 									<label className="block space-y-2 text-sm">
 										Subject
 										<Input

@@ -8,6 +8,7 @@ import { duplicateCampaign, saveCampaign, sendTestCampaign } from "@/app/(app)/c
 import AvatarNewsletter from "@/components/AvatarNewsletter";
 import BadgeStatus from "@/components/BadgeStatus";
 import DialogDiscardCampaign from "@/components/DialogDiscardCampaign";
+import DialogEmailTemplate from "@/components/DialogEmailTemplate";
 import DialogScheduleCampaign from "@/components/DialogScheduleCampaign";
 import DialogSendCampaign from "@/components/DialogSendCampaign";
 import EditorRich from "@/components/EditorRich";
@@ -43,18 +44,20 @@ export default function FormCampaign({
 	sendTimes,
 	archiveUrlBase,
 }) {
-	const isHtml = campaign.format === "html";
+	const [previousEmail, setPreviousEmail] = useState(null);
 	const [isDiscardOpen, setIsDiscardOpen] = useState(false);
-	const format = isHtml ? "html" : "rich";
 	const [initialBody] = useState(() =>
 		campaign.format === "markdown" ? markdownToHtml(campaign.markdown) : campaign.html
 	);
 	const [values, setValues] = useState({
+		format: campaign.format === "html" ? "html" : "rich",
 		segmentId: campaign.segmentId || "",
 		subject: campaign.subject,
 		previewText: campaign.previewText,
 		body: initialBody,
 	});
+	const format = values.format;
+	const isHtml = format === "html";
 	const audienceCount = values.segmentId ? (segments.find((segment) => segment._id === values.segmentId)?.count || 0) : totalAudienceCount;
 	const save = useCallback((snapshot) => saveCampaign(campaign._id, snapshot), [campaign._id]);
 	const { isDirty, isSaving, error, flush } = useAutosave(values, save);
@@ -262,6 +265,25 @@ export default function FormCampaign({
 							/>
 						</Row>
 					)}
+					<div className="flex flex-wrap gap-2 p-4">
+						<DialogEmailTemplate
+							campaign
+							newsletter={newsletter}
+							disabled={isSaving || isUploading}
+							onApply={(template) => {
+								setPreviousEmail(values);
+								setValues((old) => ({ ...old, format: "html", subject: template.subject, previewText: template.previewText, body: template.html }));
+							}}
+						/>
+						{previousEmail && (
+							<Button type="button" variant="ghost" onClick={() => {
+								setValues((old) => ({ ...old, format: previousEmail.format, subject: previousEmail.subject, previewText: previousEmail.previewText, body: previousEmail.body }));
+								setPreviousEmail(null);
+							}}>
+								Undo template
+							</Button>
+						)}
+					</div>
 					{isHtml ? (
 						<div className="relative">
 							<span className="pointer-events-none absolute top-3 right-4 text-xs text-muted-foreground">HTML</span>
@@ -275,7 +297,7 @@ export default function FormCampaign({
 							/>
 						</div>
 					) : (
-						<EditorRich content={initialBody} onChange={updateBody} />
+						<EditorRich content={values.body} onChange={updateBody} />
 					)}
 				</div>
 

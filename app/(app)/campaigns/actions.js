@@ -70,7 +70,8 @@ export async function saveCampaign(id, values) {
 	}
 
 	// The editor opens Markdown drafts as rich text, so their first save moves them to it.
-	const format = campaign.format === "markdown" ? "rich" : campaign.format;
+	const format = values?.format ?? (campaign.format === "markdown" ? "rich" : campaign.format);
+	if (!["rich", "html"].includes(format)) return { error: "Choose a supported email format" };
 	const thumbnailUrl = firstImageUrl({ format, html: body });
 	const { matchedCount } = await Campaign.updateOne(
 		{ _id: campaign._id, status: { $in: EDITABLE_STATUSES } },
