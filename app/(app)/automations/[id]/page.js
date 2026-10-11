@@ -1,6 +1,8 @@
 import { isValidObjectId } from "mongoose";
 import { notFound } from "next/navigation";
 import Link from "next/link";
+import RecoveryReport from "@/components/RecoveryReport";
+import { getRecoveryReport } from "@/lib/recovery-attribution";
 import AutomationEditor from "@/components/AutomationEditor";
 import { connectDb } from "@/lib/db";
 import { serialize } from "@/lib/serialize";
@@ -17,7 +19,7 @@ export default async function AutomationPage({ params }) {
 	await connectDb();
 	const flow = await Automation.findById(id).lean();
 	if (!flow) notFound();
-	const [newsletter, runs, totals] = await Promise.all([
+	const [newsletter, runs, totals, recovery] = await Promise.all([
 		Newsletter.findById(flow.newsletterId).lean(),
 		AutomationRun.find({ automationId: id })
 			.sort({ createdAt: -1 })
@@ -27,6 +29,7 @@ export default async function AutomationPage({ params }) {
 			{ $match: { automationId: flow._id } },
 			{ $group: { _id: "$status", count: { $sum: 1 } } },
 		]),
+		flow.trigger === "cart.abandoned" ? getRecoveryReport(flow._id) : null,
 	]);
 	if (!newsletter) notFound();
 	const contacts = await Contact.find({
@@ -43,6 +46,7 @@ export default async function AutomationPage({ params }) {
 				enabled={automationsEnabled()}
 				sending={isSendingEnabled()}
 			/>
+			{recovery && <RecoveryReport report={recovery} />}
 			<section className="mt-10 space-y-4">
 				<h2 className="text-xl font-semibold">Journey activity</h2>
 				<p className="text-sm text-muted-foreground">

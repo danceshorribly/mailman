@@ -22,7 +22,10 @@ import {
 	stepRun,
 } from "../lib/automation-engine.js";
 import { normalizeCommerceEvent } from "../lib/commerce-rules.js";
-import { normalizeDefinition, starterDefinition } from "../lib/automation-rules.js";
+import {
+	normalizeDefinition,
+	starterDefinition,
+} from "../lib/automation-rules.js";
 import { rulesToQuery, matchesRules } from "../lib/segments.js";
 import { importContactRows } from "../lib/contact-import.js";
 
@@ -500,21 +503,285 @@ test("real MongoDB: concurrent duplicate receipts are safe and conflicting event
 	);
 });
 
-
 test("real MongoDB: visual design survives snapshots and queues its compiled email", async () => {
 	await contact();
-	const design = JSON.parse(await readFile(new URL("../public/email-templates/cart-sv.json", import.meta.url), "utf8"));
-	design.blocks.find((block) => block.type === "heading").title = "Din redigerade varukorg";
-	const definition = normalizeDefinition({ start: "email", nodes: [{ id: "email", type: "email", subject: "Din varukorg", design, html: "forged", next: "end" }, { id: "end", type: "end" }] });
+	const design = JSON.parse(
+		await readFile(
+			new URL("../public/email-templates/cart-sv.json", import.meta.url),
+			"utf8",
+		),
+	);
+	design.blocks.find((block) => block.type === "heading").title =
+		"Din redigerade varukorg";
+	const definition = normalizeDefinition({
+		start: "email",
+		nodes: [
+			{
+				id: "email",
+				type: "email",
+				subject: "Din varukorg",
+				design,
+				html: "forged",
+				next: "end",
+			},
+			{ id: "end", type: "end" },
+		],
+	});
 	await flow("cart.abandoned", definition);
 	await receive("cart.updated", cartData());
 	await tick();
 	const run = await AutomationRun.findOne().lean();
 	assert.deepEqual(run.definition.nodes[0].design, definition.nodes[0].design);
 	const message = await Message.findOne().lean();
-	assert.equal(message.content.html, renderEmailDesign(definition.nodes[0].design));
+	assert.equal(
+		message.content.html,
+		renderEmailDesign(definition.nodes[0].design),
+	);
 	assert.match(message.content.html, /Din redigerade varukorg/);
 	assert.doesNotMatch(message.content.html, /forged/);
 	assert.equal(message.content.checkoutUrl, cartData().checkoutUrl);
 	assert.equal(sends, 1);
+});
+
+// The delivery stub writes sentAt only; no provider or actual mailbox is used.
+async function recoverableOrder() {
+	process.env.SESSION_SECRET =
+		"integration-recovery-secret-at-least-32-characters";
+	await contact();
+	const automation = await flow("cart.abandoned");
+	await receive("cart.updated", cartData());
+	await tick();
+	const message = await Message.findOne({
+		automationId: automation._id,
+	}).lean();
+	await Message.updateOne(
+		{ _id: message._id },
+		{ $set: { sentAt: hoursAgo(1) } },
+	);
+	const run = await AutomationRun.findById(message.automationRunId).lean();
+	const { createRecoveryToken } = await import("../lib/recovery-tokens.js");
+	return {
+		automation,
+		message,
+		run,
+		data: {
+			...orderData(),
+			recoveryTouch: {
+				token: createRecoveryToken(message._id),
+				cartExternalId: run.context.cartExternalId,
+				cartVersion: run.context.cartVersion.toISOString(),
+				touchedAt: hoursAgo(0.75).toISOString(),
+			},
+		},
+	};
+}
+const recoveryReport = async (id) =>
+	(await import("../lib/recovery-attribution.js")).getRecoveryReport(id);
+
+test("real MongoDB: recovery attributes one paid order to its email and retries do not duplicate revenue", async () => {
+	const { automation, message, data } = await recoverableOrder();
+	await receive("order.updated", data, "recovery-order");
+	assert.equal((await tick()).failed, 0);
+	await receive("order.updated", data, "recovery-order");
+	await tick();
+	const order = await CommerceRecord.findOne({ kind: "order" }).lean();
+	assert.equal(String(order.recovery.messageId), String(message._id));
+	const report = await recoveryReport(automation._id);
+	assert.equal(report.orders, 1);
+	assert.equal(report.sent, 1);
+	assert.deepEqual(report.revenue, { SEK: 100 });
+	assert.equal(report.nodes[0].id, "email");
+	assert.equal(report.nodes[0].orders, 1);
+	assert.equal(report.recent[0].externalId, data.externalId);
+});
+test("real MongoDB: refunds update attributed revenue and stale paid events cannot undo them", async () => {
+	const { automation, data } = await recoverableOrder();
+	await receive("order.updated", data);
+	await tick();
+	await receive("order.updated", {
+		...data,
+		total: 60,
+		updatedAt: new Date(Date.now() + 1000).toISOString(),
+	});
+	await tick();
+	assert.deepEqual((await recoveryReport(automation._id)).revenue, { SEK: 60 });
+	await receive("order.updated", {
+		...data,
+		status: "refunded",
+		total: 0,
+		paidAt: undefined,
+		updatedAt: new Date(Date.now() + 2000).toISOString(),
+	});
+	await tick();
+	await receive("order.updated", data);
+	await tick();
+	const report = await recoveryReport(automation._id);
+	assert.equal(report.orders, 0);
+	assert.deepEqual(report.revenue, {});
+	assert.equal(report.recent[0].status, "refunded");
+	assert.equal(report.recent[0].total, 0);
+	assert.ok((await CommerceRecord.findOne({ kind: "order" })).recovery);
+});
+test("real MongoDB: competing orders and concurrent attribution can consume a cart version only once", async () => {
+	const { automation, data } = await recoverableOrder();
+	await Promise.all([
+		receive("order.updated", data),
+		receive("order.updated", { ...data, externalId: "wc:101" }),
+	]);
+	assert.equal((await tick()).failed, 0);
+	const { attributeRecoveredOrder } =
+		await import("../lib/recovery-attribution.js");
+	const orders = await CommerceRecord.find({ kind: "order" }).lean();
+	await Promise.all(
+		orders.flatMap((order) => [
+			attributeRecoveredOrder(order),
+			attributeRecoveredOrder(order),
+		]),
+	);
+	assert.equal((await recoveryReport(automation._id)).orders, 1);
+	assert.equal(
+		await CommerceRecord.countDocuments({
+			"recovery.cartKey": { $exists: true },
+		}),
+		1,
+	);
+});
+test("real MongoDB: same-email purchases, historical orders and forged cart metadata receive no credit", async () => {
+	const { automation, data } = await recoverableOrder();
+	await receive("order.updated", {
+		...data,
+		externalId: "wc:plain",
+		recoveryTouch: undefined,
+	});
+	await receive(
+		"order.updated",
+		{ ...data, externalId: "wc:history" },
+		"history",
+		true,
+	);
+	await receive("order.updated", {
+		...data,
+		externalId: "wc:wrong-cart",
+		recoveryTouch: { ...data.recoveryTouch, cartExternalId: "wrong" },
+	});
+	await receive("order.updated", {
+		...data,
+		externalId: "wc:forged",
+		recoveryTouch: {
+			...data.recoveryTouch,
+			token: `${"f".repeat(24)}.${"a".repeat(43)}`,
+		},
+	});
+	assert.equal((await tick()).failed, 0);
+	assert.equal((await recoveryReport(automation._id)).orders, 0);
+});
+test("real MongoDB: delayed payment credits an order placed inside the window and cancellation removes it", async () => {
+	const { automation, data } = await recoverableOrder();
+	await receive("order.updated", {
+		...data,
+		status: "placed",
+		paidAt: undefined,
+	});
+	await tick();
+	assert.equal((await recoveryReport(automation._id)).orders, 0);
+	await receive("order.updated", {
+		...data,
+		paidAt: new Date().toISOString(),
+		updatedAt: new Date(Date.now() + 1000).toISOString(),
+	});
+	await tick();
+	assert.equal((await recoveryReport(automation._id)).orders, 1);
+	await receive("order.updated", {
+		...data,
+		status: "cancelled",
+		paidAt: undefined,
+		updatedAt: new Date(Date.now() + 2000).toISOString(),
+	});
+	await tick();
+	const report = await recoveryReport(automation._id);
+	assert.equal(report.orders, 0);
+	assert.equal(report.recent[0].status, "cancelled");
+});
+test("real MongoDB: reports keep currencies and steps separate and history is bounded", async () => {
+	const { automation, message } = await recoverableOrder();
+	const message2 = await Message.create({
+		kind: "automation",
+		newsletterId: newsletter._id,
+		automationId: automation._id,
+		automationRunId: new mongoose.Types.ObjectId(),
+		automationNodeId: "second",
+		email: "a@example.com",
+		sentAt: new Date(),
+		content: { subject: "Second reminder" },
+	});
+	const rows = Array.from({ length: 35 }, (_, index) => ({
+		storeId: store._id,
+		newsletterId: newsletter._id,
+		kind: "order",
+		externalId: `wc:report-${index}`,
+		email: "alex@example.com",
+		version: new Date(),
+		placedAt: new Date(Date.now() - index * 1000),
+		paidAt: new Date(),
+		status: "paid",
+		currency: index % 2 ? "EUR" : "SEK",
+		total: index % 2 ? 12.35 : 100,
+		recovery: {
+			automationId: automation._id,
+			messageId: index % 2 ? message2._id : message._id,
+			nodeId: index % 2 ? "second" : "email",
+			nodeLabel: index % 2 ? "Second reminder" : "First reminder",
+			cartKey: `synthetic-${index}`,
+		},
+	}));
+	await CommerceRecord.insertMany(rows);
+	const report = await recoveryReport(automation._id);
+	assert.equal(report.orders, 35);
+	assert.equal(report.sent, 2);
+	assert.deepEqual(report.revenue, { SEK: 1800, EUR: 209.95 });
+	assert.equal(report.nodes.length, 2);
+	assert.equal(report.recent.length, 30);
+	assert.equal(report.recent[0].externalId, "wc:report-0");
+});
+
+test("real MongoDB: payment after seven days can credit an order placed promptly after the link visit", async () => {
+	const { automation, message, run, data } = await recoverableOrder();
+	const cartVersion = hoursAgo(300);
+	await AutomationRun.updateOne(
+		{ _id: run._id },
+		{ $set: { "context.cartVersion": cartVersion } },
+	);
+	await Message.updateOne(
+		{ _id: message._id },
+		{ $set: { sentAt: hoursAgo(280) } },
+	);
+	await receive("order.updated", {
+		...data,
+		placedAt: hoursAgo(250).toISOString(),
+		paidAt: new Date().toISOString(),
+		updatedAt: new Date(Date.now() + 1000).toISOString(),
+		recoveryTouch: {
+			...data.recoveryTouch,
+			cartVersion: cartVersion.toISOString(),
+			touchedAt: hoursAgo(260).toISOString(),
+		},
+	});
+	assert.equal((await tick()).failed, 0);
+	assert.equal((await recoveryReport(automation._id)).orders, 1);
+});
+
+test("real MongoDB: a historical order cannot gain recovery credit from later live updates", async () => {
+	const { automation, data } = await recoverableOrder();
+	await receive("order.updated", data, "history-first", true);
+	await tick();
+	await receive("order.updated", {
+		...data,
+		updatedAt: new Date(Date.now() + 1000).toISOString(),
+	});
+	await tick();
+	assert.equal((await recoveryReport(automation._id)).orders, 0);
+	assert.equal(
+		(await CommerceRecord.findOne({ kind: "order" })).recoveryExcluded,
+		true,
+	);
 });

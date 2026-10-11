@@ -1,4 +1,5 @@
 import { readFile } from "node:fs/promises";
+import Message from "../models/Message.js";
 import Campaign from "../models/Campaign.js";
 import { normalizeEmailDesign, renderEmailDesign } from "../lib/email-design.js";
 // Disposable, synthetic data only. Both sending switches are forcibly off.
@@ -78,7 +79,7 @@ await Segment.create({
 		],
 	},
 });
-await Automation.create({
+const recoveryFlow = await Automation.create({
 	newsletterId: newsletter._id,
 	name: "Recover abandoned carts",
 	trigger: "cart.abandoned",
@@ -145,6 +146,20 @@ await CommerceRecord.create({
 	total: 2495,
 	items: [{ productId: "314", name: "Hibachi", quantity: 1 }],
 });
+// Synthetic recovery report fixtures. These records never pass through a sending provider.
+await Message.insertMany(Array.from({ length: 60 }, (_, index) => ({
+ kind: "automation", newsletterId: newsletter._id, automationId: recoveryFlow._id,
+ automationRunId: new mongoose.Types.ObjectId(), automationNodeId: index < 48 ? "swedish" : "english",
+ automationNodeLabel: index < 48 ? "Reminder in Swedish" : "Reminder in English",
+ email: "demo@example.com", status: "sent", sentAt: new Date(Date.now() - 2 * 86400000),
+})));
+await CommerceRecord.insertMany([
+ { externalId: "demo:101", email: "alex@example.com", currency: "SEK", total: 2495, status: "paid", nodeId: "swedish", nodeLabel: "Reminder in Swedish" },
+ { externalId: "demo:102", email: "demo@example.com", currency: "SEK", total: 3095, status: "paid", nodeId: "swedish", nodeLabel: "Reminder in Swedish" },
+ { externalId: "demo:103", email: "sam@example.com", currency: "EUR", total: 229, status: "paid", nodeId: "english", nodeLabel: "Reminder in English" },
+ { externalId: "demo:104", email: "refund@example.com", currency: "SEK", total: 0, status: "refunded", nodeId: "swedish", nodeLabel: "Reminder in Swedish" },
+].map(({ nodeId, nodeLabel, ...order }, index) => ({ ...order, storeId: store._id, newsletterId: newsletter._id, kind: "order", version: new Date(), placedAt: new Date(Date.now() - (index + 1) * 3600000), paidAt: order.status === "paid" ? new Date() : undefined, recovery: { automationId: recoveryFlow._id, nodeId, nodeLabel, cartKey: `demo:${index}`, model: "cart-link-7d", attributedAt: new Date() } })));
+console.log(`Recovery report demo: http://localhost:3417/automations/${recoveryFlow._id}`);
 const env = {
 	...process.env,
 	MONGODB_URI: mongo.getUri(),

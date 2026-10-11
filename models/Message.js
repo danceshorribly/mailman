@@ -16,6 +16,7 @@ const messageSchema = new mongoose.Schema(
 		automationRunId: { type: mongoose.Schema.Types.ObjectId, ref: "AutomationRun" },
 		automationId: { type: mongoose.Schema.Types.ObjectId, ref: "Automation" },
 	automationNodeId: String,
+	automationNodeLabel: String,
 	content: mongoose.Schema.Types.Mixed,
 	campaignId: { type: mongoose.Schema.Types.ObjectId, ref: "Campaign" },
 		newsletterId: { type: mongoose.Schema.Types.ObjectId, ref: "Newsletter", required: true },
@@ -48,6 +49,7 @@ messageSchema.index(
 messageSchema.index({ automationRunId: 1, automationNodeId: 1 }, { unique: true, partialFilterExpression: { kind: "automation" } });
 messageSchema.index({ sesMessageId: 1 }, { sparse: true });
 messageSchema.index({ kind: 1, createdAt: -1 });
+messageSchema.index({ automationId: 1, sentAt: 1, automationNodeId: 1 });
 // The overview's emails sent per hour.
 messageSchema.index({ newsletterId: 1, sentAt: 1 });
 messageSchema.index({ campaignId: 1, status: 1 });

@@ -2,7 +2,7 @@
 /**
  * Plugin Name: Mailman for WooCommerce
  * Description: Durable order and consent-gated cart sync to a self-hosted Mailman instance.
- * Version: 0.1.0
+ * Version: 0.2.0
  * Requires Plugins: woocommerce
  * Requires PHP: 8.1
  */
@@ -90,7 +90,8 @@ function product_id(int $id): string {
 function order_event($order, bool $historical = false): ?array {
     if (!$order instanceof \WC_Order || !$order->get_billing_email() || $order->get_status() === 'checkout-draft') return null;
     $paid = $order->get_date_paid();
-    $status = $order->has_status('refunded') ? 'refunded' : ($order->has_status(['cancelled', 'failed']) ? 'cancelled' : ($paid ? 'paid' : 'placed'));
+    $fully_refunded = (float) $order->get_total() > 0 && (float) $order->get_total_refunded() >= (float) $order->get_total();
+    $status = ($order->has_status('refunded') || $fully_refunded) ? 'refunded' : ($order->has_status(['cancelled', 'failed']) ? 'cancelled' : ($paid ? 'paid' : 'placed'));
     $items = [];
     foreach ($order->get_items() as $item) {
         $items[] = ['productId' => product_id($item->get_product_id()), 'variationId' => (string) $item->get_variation_id(), 'name' => $item->get_name(), 'quantity' => (int) $item->get_quantity()];
@@ -105,7 +106,14 @@ function order_event($order, bool $historical = false): ?array {
         'total' => max(0, (float) $order->get_total() - (float) $order->get_total_refunded()), 'items' => $items,
         'profile' => ['firstName' => $order->get_billing_first_name(), 'lastName' => $order->get_billing_last_name(), 'country' => $order->get_billing_country(), 'language' => $order->get_meta('wpml_language') ?: language()],
     ];
-    if ($status === 'paid') $data['paidAt'] = iso($paid->getTimestamp());
+    $recovery = $order->get_meta('_mailman_recovery_touch');
+    if (!$historical && is_array($recovery) && !empty($recovery['token'])) {
+        // Block checkout drafts can predate the return visit. Preserve the actual checkout touch time.
+        $data['placedAt'] = max($data['placedAt'], $recovery['placedAt']);
+        unset($recovery['email'], $recovery['placedAt']);
+        $data['recoveryTouch'] = $recovery;
+    }
+    if ($status === 'paid') $data['paidAt'] = max(iso($paid->getTimestamp()), $data['placedAt']);
     return ['id' => 'order:' . hash('sha256', wp_json_encode($data) . ($historical ? ':history' : '')), 'type' => 'order.updated', 'historical' => $historical, 'data' => $data];
 }
 function sync_order($id): void {
@@ -124,11 +132,56 @@ function cart_permission(): bool {
     $allowed = function_exists('KamadoConsent\\allows') && \KamadoConsent\allows('advertising');
     return (bool) apply_filters('mailman_cart_capture_allowed', $allowed);
 }
+// Attribution uses the existing consent-gated Woo session. No extra tracking cookie is created.
+function capture_recovery_touch(array $saved, string $token): void {
+    if (!WC()->session) return;
+    // A newer recovery visit replaces an earlier touch, including visits without a valid token.
+    WC()->session->set('mailman_recovery_touch', null);
+    if (!cart_permission() || !preg_match('/^[a-f0-9]{24}\.[A-Za-z0-9_-]{43}$/', $token)
+        || empty($saved['id']) || empty($saved['version']) || empty($saved['email'])
+        || ($saved['currency'] ?? '') !== get_woocommerce_currency()) return;
+    WC()->session->set('mailman_recovery_touch', [
+        'token' => $token, 'cartExternalId' => $saved['id'], 'cartVersion' => $saved['version'],
+        'touchedAt' => millisecond_iso(), 'email' => strtolower($saved['email']),
+    ]);
+}
+function attach_recovery_touch($order): void {
+    if (!$order instanceof \WC_Order || !WC()->session) return;
+    if (!cart_permission()) {
+        WC()->session->set('mailman_recovery_touch', null);
+        $order->delete_meta_data('_mailman_recovery_touch');
+        return;
+    }
+    // Checkout/payment retries keep the first order attribution unchanged.
+    if ($order->get_meta('_mailman_recovery_touch')) return;
+    $touch = WC()->session->get('mailman_recovery_touch');
+    if (!$touch) return;
+    $at = strtotime($touch['touchedAt']);
+    if (!$at || $at > time() || time() - $at > 7 * DAY_IN_SECONDS
+        || strtolower($order->get_billing_email()) !== $touch['email']) {
+        WC()->session->set('mailman_recovery_touch', null); return;
+    }
+    $touch['placedAt'] = millisecond_iso();
+    $order->update_meta_data('_mailman_recovery_touch', $touch);
+}
+function clear_recovery_touch($id): void {
+    $order = $id instanceof \WC_Order ? $id : wc_get_order($id);
+    if ($order instanceof \WC_Order && $order->get_status() !== 'checkout-draft'
+        && $order->get_meta('_mailman_recovery_touch') && WC()->session) {
+        WC()->session->set('mailman_recovery_touch', null);
+    }
+}
+add_action('woocommerce_checkout_create_order', __NAMESPACE__ . '\\attach_recovery_touch', 20, 1);
+add_action('woocommerce_store_api_checkout_update_order_meta', __NAMESPACE__ . '\\attach_recovery_touch', 20, 1);
+add_action('woocommerce_checkout_order_processed', __NAMESPACE__ . '\\clear_recovery_touch', 30, 1);
+add_action('woocommerce_store_api_checkout_order_processed', __NAMESPACE__ . '\\clear_recovery_touch', 30, 1);
+
 function cart_snapshot(string $email, array $profile = []): void {
     if (!configured() || !WC()->session || !WC()->cart) return;
     $state = WC()->session->get('mailman_cart', []);
     $profile = array_merge($state['profile'] ?? [], array_filter($profile, static fn($value) => $value !== ''));
     $allowed = cart_permission();
+    if (!$allowed) WC()->session->set('mailman_recovery_touch', null);
     if (!$allowed || WC()->cart->is_empty()) {
         if (!$state) return;
         $email = $state['email'];
@@ -159,7 +212,7 @@ function cart_snapshot(string $email, array $profile = []): void {
         $token = bin2hex(random_bytes(32));
         $restore = [];
         foreach (WC()->cart->get_cart() as $line) $restore[] = ['product_id' => (int) $line['product_id'], 'variation_id' => (int) $line['variation_id'], 'variation' => $line['variation'], 'quantity' => (int) $line['quantity']];
-        set_transient('mailman_recover_' . $token, ['items' => $restore, 'currency' => get_woocommerce_currency()], 7 * DAY_IN_SECONDS);
+        set_transient('mailman_recover_' . $token, ['items' => $restore, 'currency' => get_woocommerce_currency(), 'id' => $id, 'version' => $version, 'email' => $email], 7 * DAY_IN_SECONDS);
         $data['checkoutUrl'] = add_query_arg('mailman_recover', $token, wc_get_cart_url());
         $data['expiresAt'] = iso(time() + 7 * DAY_IN_SECONDS);
     }
@@ -197,6 +250,7 @@ add_action('template_redirect', function () {
         $key = WC()->cart->generate_cart_id($line['product_id'], $line['variation_id'], $line['variation']);
         if (!WC()->cart->find_product_in_cart($key)) WC()->cart->add_to_cart($line['product_id'], $line['quantity'], $line['variation_id'], $line['variation']);
     }
+    capture_recovery_touch($saved, sanitize_text_field(wp_unslash($_GET['mailman_attribution'] ?? '')));
     wp_safe_redirect(wc_get_cart_url()); exit;
 });
 
