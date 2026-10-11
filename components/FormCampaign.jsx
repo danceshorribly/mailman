@@ -11,6 +11,7 @@ import DialogDiscardCampaign from "@/components/DialogDiscardCampaign";
 import DialogEmailTemplate from "@/components/DialogEmailTemplate";
 import DialogScheduleCampaign from "@/components/DialogScheduleCampaign";
 import DialogSendCampaign from "@/components/DialogSendCampaign";
+import EditorEmailDesign from "@/components/EditorEmailDesign";
 import EditorRich from "@/components/EditorRich";
 import HeaderPage from "@/components/HeaderPage";
 import InputCampaignSlug from "@/components/InputCampaignSlug";
@@ -45,6 +46,7 @@ export default function FormCampaign({
 	archiveUrlBase,
 }) {
 	const [previousEmail, setPreviousEmail] = useState(null);
+	const [editorVersion, setEditorVersion] = useState(0);
 	const [isDiscardOpen, setIsDiscardOpen] = useState(false);
 	const [initialBody] = useState(() =>
 		campaign.format === "markdown" ? markdownToHtml(campaign.markdown) : campaign.html
@@ -55,6 +57,7 @@ export default function FormCampaign({
 		subject: campaign.subject,
 		previewText: campaign.previewText,
 		body: initialBody,
+		design: campaign.design || null,
 	});
 	const format = values.format;
 	const isHtml = format === "html";
@@ -271,20 +274,27 @@ export default function FormCampaign({
 							newsletter={newsletter}
 							disabled={isSaving || isUploading}
 							onApply={(template) => {
+								setEditorVersion((version) => version + 1);
 								setPreviousEmail(values);
-								setValues((old) => ({ ...old, format: "html", subject: template.subject, previewText: template.previewText, body: template.html }));
+								setValues((old) => ({ ...old, format: "html", subject: template.subject, previewText: template.previewText, body: template.html, design: template.design }));
 							}}
 						/>
 						{previousEmail && (
 							<Button type="button" variant="ghost" onClick={() => {
-								setValues((old) => ({ ...old, format: previousEmail.format, subject: previousEmail.subject, previewText: previousEmail.previewText, body: previousEmail.body }));
+								setValues((old) => ({ ...old, format: previousEmail.format, subject: previousEmail.subject, previewText: previousEmail.previewText, body: previousEmail.body, design: previousEmail.design || null }));
 								setPreviousEmail(null);
+								setEditorVersion((version) => version + 1);
 							}}>
 								Undo template
 							</Button>
 						)}
 					</div>
-					{isHtml ? (
+					{values.design ? (
+						<div className="space-y-3 px-4 pb-5">
+							<EditorEmailDesign key={editorVersion} design={values.design} newsletter={newsletter} onChange={({ design, html }) => setValues((old) => ({ ...old, design, body: html, format: "html" }))} />
+							<p className="text-sm text-muted-foreground">Edit text, images and buttons, then drag blocks into order. Changes save automatically.</p>
+						</div>
+					) : isHtml ? (
 						<div className="relative">
 							<span className="pointer-events-none absolute top-3 right-4 text-xs text-muted-foreground">HTML</span>
 							<textarea

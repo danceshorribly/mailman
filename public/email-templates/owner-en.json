@@ -1,0 +1,56 @@
+{
+  "version": 1,
+  "language": "en",
+  "blocks": [
+    {
+      "id": "block-1",
+      "type": "heading",
+      "level": 1,
+      "kicker": "For you and your Sumo",
+      "title": "Make your first\nevening your own."
+    },
+    {
+      "id": "block-2",
+      "type": "text",
+      "html": "<p>Once your grill is assembled according to its manual and in place, it is time to think about the menu. Our website has inspiration and help whenever you need it.</p>"
+    },
+    {
+      "id": "block-3",
+      "type": "button",
+      "label": "Find grilling inspiration",
+      "url": "https://kamadosumo.com/posts/bbq-tips/"
+    },
+    {
+      "id": "block-4",
+      "type": "image",
+      "src": "https://kamadosumo.com/wp-content/uploads/2026/02/classic-line.jpg",
+      "alt": "Classic grills from Kamado Sumo",
+      "url": "https://kamadosumo.com/posts/bbq-tips/"
+    },
+    {
+      "id": "block-5",
+      "type": "product",
+      "title": "Get to know your grill",
+      "html": "<p>Read the manual for your model before you start. Have a question about your grill or equipment? Reply to this email and we will help.</p>",
+      "src": "",
+      "alt": "Get to know your grill",
+      "label": "Contact Kamado Sumo",
+      "url": "https://kamadosumo.com/contact-us/"
+    },
+    {
+      "id": "block-6",
+      "type": "product",
+      "title": "Register your Sumo",
+      "html": "<p>Save your grill details with us through product registration. Registration is separate from the newsletter and any future membership.</p>",
+      "src": "",
+      "alt": "Register your Sumo",
+      "label": "Register your grill",
+      "url": "https://kamadosumo.com/register-your-sumo/"
+    },
+    {
+      "id": "block-7",
+      "type": "text",
+      "html": "<p>Not sure about sizes, models or accessories? Reply to this email and we will help you find the right fit.</p>"
+    }
+  ]
+}

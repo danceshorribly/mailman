@@ -1,0 +1,46 @@
+{
+  "version": 1,
+  "language": "sv",
+  "blocks": [
+    {
+      "id": "block-1",
+      "type": "heading",
+      "level": 1,
+      "kicker": "Nästa kväll vid glöden",
+      "title": "Samma grill.\nNya idéer."
+    },
+    {
+      "id": "block-2",
+      "type": "text",
+      "html": "<p>Ibland räcker det med en ny idé för att få fram grillhandskarna igen. Hitta något att laga, samla några hungriga och gör nästa middag till en grillkväll.</p>"
+    },
+    {
+      "id": "block-3",
+      "type": "button",
+      "label": "Utforska grilltips",
+      "url": "https://kamadosumo.com/sv/posts/bbq-tips-2/"
+    },
+    {
+      "id": "block-4",
+      "type": "image",
+      "src": "https://kamadosumo.com/wp-content/uploads/2026/04/Grillmastare-22.jpg",
+      "alt": "Tre grillkockar vid en Kamado Sumo-grill",
+      "url": "https://kamadosumo.com/sv/posts/bbq-tips-2/"
+    },
+    {
+      "id": "block-5",
+      "type": "product",
+      "title": "Verktyg för nästa idé",
+      "html": "<p>Vill du prova pizza, laga i gjutjärn eller förbättra din grillutrustning? Välj tillbehör efter det du vill laga och kontrollera att de passar din grillmodell.</p>",
+      "src": "",
+      "alt": "Verktyg för nästa idé",
+      "label": "Hitta rätt tillbehör",
+      "url": "https://kamadosumo.com/sv/tillbehor/"
+    },
+    {
+      "id": "block-6",
+      "type": "text",
+      "html": "<p>Osäker på storlek, modell eller tillbehör? Svara på mejlet så hjälper vi dig hitta rätt.</p>"
+    }
+  ]
+}

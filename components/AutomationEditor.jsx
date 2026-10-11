@@ -1,4 +1,5 @@
 "use client";
+import EditorEmailDesign from "@/components/EditorEmailDesign";
 import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import {
@@ -50,6 +51,7 @@ export default function AutomationEditor({
 	const [result, setResult] = useState(null);
 	const [dirty, setDirty] = useState(false);
 	const [previousEmail, setPreviousEmail] = useState(null);
+	const [editorVersion, setEditorVersion] = useState(0);
 	const [pending, start] = useTransition();
 	const editable = flow.status !== "active";
 	const node = draft.definition.nodes.find((item) => item.id === selected);
@@ -359,17 +361,18 @@ export default function AutomationEditor({
 											newsletter={newsletter}
 											disabled={!editable}
 											onApply={(template) => {
+												setEditorVersion((version) => version + 1);
 												setPreviousEmail({
 													id: node.id, subject: node.subject,
 													previewText: node.previewText,
 													format: node.format || "markdown",
-													html: node.html || "", markdown: node.markdown || "",
+													html: node.html || "", markdown: node.markdown || "", design: node.design || null,
 												});
-												updateNode({ subject: template.subject, previewText: template.previewText, format: "html", html: template.html });
+												updateNode({ subject: template.subject, previewText: template.previewText, format: "html", html: template.html, design: template.design });
 											}}
 										/>
 										{previousEmail?.id === node.id && (
-											<Button type="button" variant="ghost" onClick={() => { updateNode(previousEmail); setPreviousEmail(null); }}>
+											<Button type="button" variant="ghost" onClick={() => { updateNode(previousEmail); setPreviousEmail(null); setEditorVersion((version) => version + 1); }}>
 												Undo template
 											</Button>
 										)}
@@ -391,6 +394,7 @@ export default function AutomationEditor({
 											}
 										/>
 									</label>
+									{node.design ? <EditorEmailDesign key={`${node.id}:${editorVersion}`} design={node.design} newsletter={newsletter} disabled={!editable} onChange={({ design, html }) => updateNode({ design, html, format: "html" })} /> : <>
 									<label className="block space-y-2 text-sm">
 										Email format
 										<FieldSelect
@@ -425,6 +429,8 @@ export default function AutomationEditor({
 											}
 										/>
 									</label>
+									</>}
+
 									<p className="text-xs text-muted-foreground">
 										Personalization:{" "}
 										{"{{firstName}}, {{lastName}}, {{fullName}}"}.{" "}

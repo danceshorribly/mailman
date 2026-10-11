@@ -1,0 +1,56 @@
+{
+  "version": 1,
+  "language": "sv",
+  "blocks": [
+    {
+      "id": "block-1",
+      "type": "heading",
+      "level": 1,
+      "kicker": "För dig och din Sumo",
+      "title": "Låt första\nkvällen ta form."
+    },
+    {
+      "id": "block-2",
+      "type": "text",
+      "html": "<p>När grillen är monterad enligt manualen och på plats är det dags att fundera på menyn. På webben hittar du inspiration och hjälp när du behöver den.</p>"
+    },
+    {
+      "id": "block-3",
+      "type": "button",
+      "label": "Hitta inspiration till grillningen",
+      "url": "https://kamadosumo.com/sv/posts/bbq-tips-2/"
+    },
+    {
+      "id": "block-4",
+      "type": "image",
+      "src": "https://kamadosumo.com/wp-content/uploads/2026/02/classic-line.jpg",
+      "alt": "Classic-grillar från Kamado Sumo",
+      "url": "https://kamadosumo.com/sv/posts/bbq-tips-2/"
+    },
+    {
+      "id": "block-5",
+      "type": "product",
+      "title": "Lär känna din grill",
+      "html": "<p>Läs manualen för din modell innan du börjar. Har du en fråga om grillen eller utrustningen? Svara på mejlet så hjälper vi dig.</p>",
+      "src": "",
+      "alt": "Lär känna din grill",
+      "label": "Kontakta Kamado Sumo",
+      "url": "https://kamadosumo.com/sv/kontakta-oss/"
+    },
+    {
+      "id": "block-6",
+      "type": "product",
+      "title": "Registrera din Sumo",
+      "html": "<p>Spara grillens uppgifter hos oss genom produktregistreringen. Registreringen är separat från nyhetsbrevet och ett framtida medlemskap.</p>",
+      "src": "",
+      "alt": "Registrera din Sumo",
+      "label": "Registrera din grill",
+      "url": "https://kamadosumo.com/sv/registrera-din-sumo/"
+    },
+    {
+      "id": "block-7",
+      "type": "text",
+      "html": "<p>Osäker på storlek, modell eller tillbehör? Svara på mejlet så hjälper vi dig hitta rätt.</p>"
+    }
+  ]
+}

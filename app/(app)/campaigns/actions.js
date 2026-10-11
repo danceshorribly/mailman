@@ -15,6 +15,7 @@ import { getSendProblem } from "@/lib/sending-rules";
 import { ARCHIVE_SLUG_PATTERN } from "@/lib/slug";
 import { firstImageUrl } from "@/lib/thumbnail";
 import { MAX_BODY_BYTES } from "@/lib/validation";
+import { normalizeEmailDesign, renderEmailDesign } from "@/lib/email-design";
 import Campaign from "@/models/Campaign";
 import Segment from "@/models/Segment";
 import Newsletter from "@/models/Newsletter";
@@ -63,14 +64,17 @@ export async function saveCampaign(id, values) {
 
     const segmentId = values?.segmentId || null;
     if (segmentId && (!isValidObjectId(segmentId) || !await Segment.exists({ _id: segmentId, newsletterId: campaign.newsletterId }))) return { error: "Segment not found" };
-	const body = String(values?.body ?? "");
+	let design;
+	try { if (values?.design) design = normalizeEmailDesign(values.design); }
+	catch (error) { return { error: error.message }; }
+	const body = design ? renderEmailDesign(design) : String(values?.body ?? "");
 	const bytes = Buffer.byteLength(body, "utf8");
 	if (bytes > MAX_BODY_BYTES) {
 		return { error: `The content is ${Math.ceil(bytes / 1000)} KB. The limit is ${MAX_BODY_BYTES / 1000} KB.` };
 	}
 
 	// The editor opens Markdown drafts as rich text, so their first save moves them to it.
-	const format = values?.format ?? (campaign.format === "markdown" ? "rich" : campaign.format);
+	const format = design ? "html" : (values?.format ?? (campaign.format === "markdown" ? "rich" : campaign.format));
 	if (!["rich", "html"].includes(format)) return { error: "Choose a supported email format" };
 	const thumbnailUrl = firstImageUrl({ format, html: body });
 	const { matchedCount } = await Campaign.updateOne(
@@ -82,9 +86,10 @@ export async function saveCampaign(id, values) {
 				previewText: String(values?.previewText ?? "").slice(0, 300),
 				format,
 				html: body,
+				...(design && { design }),
 				...(thumbnailUrl && { thumbnailUrl }),
 			},
-			...(!thumbnailUrl && { $unset: { thumbnailUrl: 1 } }),
+			...((!thumbnailUrl || !design) && { $unset: { ...(!thumbnailUrl && { thumbnailUrl: 1 }), ...(!design && { design: 1 }) } }),
 		}
 	);
 	if (!matchedCount) return { error: "This campaign is already sending" };
@@ -266,6 +271,7 @@ export async function duplicateCampaign(id) {
 		format: campaign.format,
 		markdown: campaign.markdown,
 		html: campaign.html,
+		design: campaign.design,
 		thumbnailUrl: campaign.thumbnailUrl,
 		// A copy of an API draft is still content from the API key's holder, not from the dashboard.
 		...(campaign.source === "api" && { source: "api" }),

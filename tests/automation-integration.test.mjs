@@ -1,3 +1,5 @@
+import { readFile } from "node:fs/promises";
+import { renderEmailDesign } from "../lib/email-design.js";
 import assert from "node:assert/strict";
 import { test, before, after, beforeEach } from "node:test";
 import mongoose from "mongoose";
@@ -20,7 +22,7 @@ import {
 	stepRun,
 } from "../lib/automation-engine.js";
 import { normalizeCommerceEvent } from "../lib/commerce-rules.js";
-import { starterDefinition } from "../lib/automation-rules.js";
+import { normalizeDefinition, starterDefinition } from "../lib/automation-rules.js";
 import { rulesToQuery, matchesRules } from "../lib/segments.js";
 import { importContactRows } from "../lib/contact-import.js";
 
@@ -496,4 +498,23 @@ test("real MongoDB: concurrent duplicate receipts are safe and conflicting event
 		() => receive("cart.updated", { ...data, total: 200 }, "concurrent-event"),
 		/different payload/,
 	);
+});
+
+
+test("real MongoDB: visual design survives snapshots and queues its compiled email", async () => {
+	await contact();
+	const design = JSON.parse(await readFile(new URL("../public/email-templates/cart-sv.json", import.meta.url), "utf8"));
+	design.blocks.find((block) => block.type === "heading").title = "Din redigerade varukorg";
+	const definition = normalizeDefinition({ start: "email", nodes: [{ id: "email", type: "email", subject: "Din varukorg", design, html: "forged", next: "end" }, { id: "end", type: "end" }] });
+	await flow("cart.abandoned", definition);
+	await receive("cart.updated", cartData());
+	await tick();
+	const run = await AutomationRun.findOne().lean();
+	assert.deepEqual(run.definition.nodes[0].design, definition.nodes[0].design);
+	const message = await Message.findOne().lean();
+	assert.equal(message.content.html, renderEmailDesign(definition.nodes[0].design));
+	assert.match(message.content.html, /Din redigerade varukorg/);
+	assert.doesNotMatch(message.content.html, /forged/);
+	assert.equal(message.content.checkoutUrl, cartData().checkoutUrl);
+	assert.equal(sends, 1);
 });

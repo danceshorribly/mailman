@@ -1,0 +1,46 @@
+{
+  "version": 1,
+  "language": "en",
+  "blocks": [
+    {
+      "id": "block-1",
+      "type": "heading",
+      "level": 1,
+      "kicker": "Welcome to Kamado Sumo",
+      "title": "See you\nby the fire."
+    },
+    {
+      "id": "block-2",
+      "type": "text",
+      "html": "<p>A new grill on your wish list? Or fresh ideas for the one you already own? Find inspiration, knowledge and tools for your next evening by the embers.</p>"
+    },
+    {
+      "id": "block-3",
+      "type": "button",
+      "label": "Find your Sumo",
+      "url": "https://kamadosumo.com/#find-your-sumo"
+    },
+    {
+      "id": "block-4",
+      "type": "image",
+      "src": "https://kamadosumo.com/wp-content/uploads/2026/02/icon-line.jpg",
+      "alt": "Kamado Sumo Icon grills in three sizes",
+      "url": "https://kamadosumo.com/#find-your-sumo"
+    },
+    {
+      "id": "block-5",
+      "type": "product",
+      "title": "Already have a grill?",
+      "html": "<p>Start with something you cannot wait to cook. Explore our grilling tips and find inspiration for your next dinner.</p>",
+      "src": "",
+      "alt": "Already have a grill?",
+      "label": "Find your next idea",
+      "url": "https://kamadosumo.com/posts/bbq-tips/"
+    },
+    {
+      "id": "block-6",
+      "type": "text",
+      "html": "<p>Not sure about sizes, models or accessories? Reply to this email and we will help you find the right fit.</p>"
+    }
+  ]
+}

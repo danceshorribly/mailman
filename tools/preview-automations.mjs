@@ -1,3 +1,6 @@
+import { readFile } from "node:fs/promises";
+import Campaign from "../models/Campaign.js";
+import { normalizeEmailDesign, renderEmailDesign } from "../lib/email-design.js";
 // Disposable, synthetic data only. Both sending switches are forcibly off.
 import { spawn } from "node:child_process";
 import mongoose from "mongoose";
@@ -20,6 +23,8 @@ const newsletter = await Newsletter.create({
 	fromName: "Kamado Sumo",
 	postalAddress: "Demonstration address, Sweden",
 });
+const design = normalizeEmailDesign(JSON.parse(await readFile(new URL("../public/email-templates/welcome-sv.json", import.meta.url), "utf8")));
+await Campaign.create({ newsletterId: newsletter._id, subject: "Välkommen till nästa grillkväll", previewText: "Grillar, inspiration och verktyg för det du vill laga.", format: "html", design, html: renderEmailDesign(design) });
 const key = await ApiKey.create({
 	name: "Demo WooCommerce",
 	prefix: "demo",
