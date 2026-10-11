@@ -16,6 +16,7 @@ const campaignSchema = new mongoose.Schema(
 		html: { type: String, default: "" },
 		status: { type: String, enum: CAMPAIGN_STATUSES, default: "draft" },
 		// Warm-up: send to the most engaged contacts first, capped at audienceLimit.
+		segmentId: { type: mongoose.Schema.Types.ObjectId, ref: "Segment" },
 		audienceLimit: { type: Number, min: 1 },
 		source: { type: String, default: "dashboard" },
 		scheduledAt: { type: Date },

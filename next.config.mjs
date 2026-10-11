@@ -19,6 +19,8 @@ const SECURITY_HEADERS = [
 /** @type {import('next').NextConfig} */
 const nextConfig = {
 	poweredByHeader: false,
+	// Keep the repository agent instructions stable, including its punctuation policy.
+	agentRules: false,
 	images: {
 		remotePatterns: [{ protocol: "https", hostname: "*.public.blob.vercel-storage.com" }],
 	},

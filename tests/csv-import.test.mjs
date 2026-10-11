@@ -12,6 +12,7 @@ test("maps common export headers", () => {
 	const columns = mapColumns(["Email", "Status", "Created At", "Open Rate", "Click Through Rate"]);
 	assert.deepEqual(columns, {
 		email: "Email",
+        firstName: null, lastName: null, fullName: null, country: null, language: null, tags: null,
 		status: "Status",
 		subscribedAt: "Created At",
 		emailsReceived: null,

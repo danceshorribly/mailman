@@ -1,4 +1,5 @@
 "use client";
+import { FieldSelect } from "@/components/RuleBuilder";
 
 import { useCallback, useDeferredValue, useEffect, useEffectEvent, useMemo, useState, useTransition } from "react";
 import { Check, CircleAlert, Copy, FlaskConical, Loader2, MoreHorizontal, Trash2 } from "lucide-react";
@@ -34,7 +35,8 @@ const UPLOADING_MESSAGE = "Wait for images to finish uploading";
 export default function FormCampaign({
 	campaign,
 	newsletter,
-	audienceCount,
+	audienceCount: totalAudienceCount,
+	segments = [],
 	isDomainVerified,
 	isSendingEnabled,
 	testEmail,
@@ -48,10 +50,12 @@ export default function FormCampaign({
 		campaign.format === "markdown" ? markdownToHtml(campaign.markdown) : campaign.html
 	);
 	const [values, setValues] = useState({
+		segmentId: campaign.segmentId || "",
 		subject: campaign.subject,
 		previewText: campaign.previewText,
 		body: initialBody,
 	});
+	const audienceCount = values.segmentId ? (segments.find((segment) => segment._id === values.segmentId)?.count || 0) : totalAudienceCount;
 	const save = useCallback((snapshot) => saveCampaign(campaign._id, snapshot), [campaign._id]);
 	const { isDirty, isSaving, error, flush } = useAutosave(values, save);
 	const [isTesting, startTesting] = useTransition();
@@ -229,6 +233,7 @@ export default function FormCampaign({
 							</span>
 						</span>
 					</Row>
+					<Row label="Segment"><FieldSelect aria-label="Campaign audience segment" value={values.segmentId} onChange={update("segmentId")}><option value="">All active contacts</option>{segments.map((segment) => <option key={segment._id} value={segment._id}>{segment.name} ({segment.count})</option>)}</FieldSelect></Row>
 					<Row label="Subject">
 						<input
 							value={values.subject}

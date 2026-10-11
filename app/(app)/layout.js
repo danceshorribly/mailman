@@ -13,7 +13,7 @@ export default async function AppLayout({ children }) {
 			<aside className="sticky top-0 hidden h-dvh w-60 shrink-0 flex-col border-r border-border/60 px-3 py-4 md:flex">
 				<Link href="/" className="mb-6 flex h-9 items-center gap-2 px-2.5">
 					<LogoMailcheap />
-					<span className="text-sm font-semibold tracking-tight">Mailcheap</span>
+					<span className="text-sm font-semibold tracking-tight">Mailman</span>
 				</Link>
 				<NavLinks />
 				<div className="mt-auto">

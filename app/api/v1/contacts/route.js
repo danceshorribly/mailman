@@ -35,6 +35,7 @@ function readInput(body) {
 		return { error: "resubscribe must be a boolean" };
 	}
 	return {
+		profile: body.profile,
 		slug: newsletter.trim().toLowerCase(),
 		email: normalizedEmail,
 		source: source?.trim() || "api",
@@ -73,6 +74,7 @@ export async function POST(request) {
 		email: input.email,
 		source: input.source,
 		resubscribe: input.resubscribe,
+		profile: input.profile,
 	});
 	// A pending contact who signs up again gets the confirmation again (throttled per address).
 	const isPending = contact.status === "pending";

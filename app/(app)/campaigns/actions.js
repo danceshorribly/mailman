@@ -16,6 +16,7 @@ import { ARCHIVE_SLUG_PATTERN } from "@/lib/slug";
 import { firstImageUrl } from "@/lib/thumbnail";
 import { MAX_BODY_BYTES } from "@/lib/validation";
 import Campaign from "@/models/Campaign";
+import Segment from "@/models/Segment";
 import Newsletter from "@/models/Newsletter";
 
 const MAX_SUBJECT_LENGTH = 200;
@@ -60,6 +61,8 @@ export async function saveCampaign(id, values) {
 	if (!campaign) return { error: "Campaign not found" };
 	if (!EDITABLE_STATUSES.includes(campaign.status)) return { error: "Only drafts can be edited" };
 
+    const segmentId = values?.segmentId || null;
+    if (segmentId && (!isValidObjectId(segmentId) || !await Segment.exists({ _id: segmentId, newsletterId: campaign.newsletterId }))) return { error: "Segment not found" };
 	const body = String(values?.body ?? "");
 	const bytes = Buffer.byteLength(body, "utf8");
 	if (bytes > MAX_BODY_BYTES) {
@@ -73,6 +76,7 @@ export async function saveCampaign(id, values) {
 		{ _id: campaign._id, status: { $in: EDITABLE_STATUSES } },
 		{
 			$set: {
+				segmentId,
 				subject: String(values?.subject ?? "").slice(0, MAX_SUBJECT_LENGTH),
 				previewText: String(values?.previewText ?? "").slice(0, 300),
 				format,
@@ -257,6 +261,7 @@ export async function duplicateCampaign(id) {
 		newsletterId: campaign.newsletterId,
 		subject: campaign.subject ? `${campaign.subject.slice(0, MAX_SUBJECT_LENGTH - COPY_SUFFIX.length)}${COPY_SUFFIX}` : "",
 		previewText: campaign.previewText,
+		segmentId: campaign.segmentId,
 		format: campaign.format,
 		markdown: campaign.markdown,
 		html: campaign.html,

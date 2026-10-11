@@ -142,7 +142,7 @@ export default async function ContactsPage({ searchParams }) {
 													gravatarHash={gravatarHash(contact.email)}
 													size={26}
 												/>
-												<span className="truncate">{contact.email}</span>
+												<Link href={`/contacts/${contact._id}`} className="truncate hover:underline">{contact.email}</Link>
 											</span>
 										</TableCell>
 										<TableCell>

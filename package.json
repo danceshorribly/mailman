@@ -1,5 +1,5 @@
 {
-  "name": "mailcheap",
+  "name": "mailman",
   "version": "1.0.0",
   "private": true,
   "license": "MIT",
@@ -49,6 +49,7 @@
     "@tailwindcss/postcss": "^4",
     "eslint": "^9",
     "eslint-config-next": "16.3.8",
+    "mongodb-memory-server": "^11.3.0",
     "shadcn": "^4.21.1",
     "tailwindcss": "^4"
   }

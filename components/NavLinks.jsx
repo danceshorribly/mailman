@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Globe, KeyRound, LayoutGrid, Newspaper, Send, Users } from "lucide-react";
+import { GitBranch, ShoppingCart, ListFilter, Globe, KeyRound, LayoutGrid, Newspaper, Send, Users } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 export default function NavLinks({ onNavigate }) {
@@ -38,6 +38,9 @@ const NAV_ITEMS = [
 	{ href: "/", label: "Overview", icon: LayoutGrid },
 	{ href: "/campaigns", label: "Campaigns", icon: Send },
 	{ href: "/contacts", label: "Contacts", icon: Users },
+	{ href: "/segments", label: "Segments", icon: ListFilter },
+	{ href: "/automations", label: "Automations", icon: GitBranch },
+	{ href: "/commerce", label: "Commerce", icon: ShoppingCart },
 	{ href: "/newsletters", label: "Newsletters", icon: Newspaper },
 	{ href: "/domains", label: "Domains", icon: Globe },
 	{ href: "/api-keys", label: "API keys", icon: KeyRound },
