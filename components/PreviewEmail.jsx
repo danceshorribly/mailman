@@ -67,7 +67,7 @@ export default function PreviewEmail({
 						</p>
 						<p className="truncate">
 							<span className="font-medium">{subject || "No subject"}</span>
-							{previewText && <span className="text-muted-foreground"> — {previewText}</span>}
+							{previewText && <span className="text-muted-foreground"> - {previewText}</span>}
 						</p>
 					</div>
 				</div>

@@ -1,0 +1,29 @@
+{
+  "version": 1,
+  "language": "sv",
+  "blocks": [
+    {
+      "id": "block-1",
+      "type": "heading",
+      "level": 1,
+      "kicker": "Nästa kväll vid glöden",
+      "title": "En fråga\ninnan du väljer?"
+    },
+    {
+      "id": "block-2",
+      "type": "text",
+      "html": "<p>Funderar du på storlek, modell eller rätt tillbehör? Svara på mejlet så hjälper vi dig att välja. Du kan också gå tillbaka till varukorgen när du är redo.</p>"
+    },
+    {
+      "id": "block-3",
+      "type": "button",
+      "label": "Tillbaka till varukorgen",
+      "url": "{{checkoutUrl}}"
+    },
+    {
+      "id": "block-4",
+      "type": "text",
+      "html": "<p>Behöver du hjälp? Svara på mejlet så hjälper vi dig hitta rätt.</p>"
+    }
+  ]
+}

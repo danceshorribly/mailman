@@ -1,0 +1,66 @@
+{
+  "version": 1,
+  "language": "sv",
+  "blocks": [
+    {
+      "id": "block-1",
+      "type": "heading",
+      "level": 1,
+      "kicker": "Hitta din Sumo",
+      "title": "Din plats.\nDin grill."
+    },
+    {
+      "id": "block-2",
+      "type": "text",
+      "html": "<p>Hur många brukar samlas kring bordet? Vad vill du laga? Och vilken känsla vill du ge din uteplats? Låt det styra när du väljer din Sumo.</p>"
+    },
+    {
+      "id": "block-3",
+      "type": "button",
+      "label": "Jämför kamadogrillarna",
+      "url": "https://kamadosumo.com/sv/kamado-grillar/"
+    },
+    {
+      "id": "block-4",
+      "type": "image",
+      "src": "https://kamadosumo.com/wp-content/uploads/2026/02/icon-line.jpg",
+      "alt": "Icon-serien från Kamado Sumo",
+      "url": "https://kamadosumo.com/sv/kamado-grillar/"
+    },
+    {
+      "id": "block-5",
+      "type": "product",
+      "title": "Icon",
+      "html": "<p>För dig som vill ge grillen en självklar plats på uteplatsen. Utforska seriens uttryck och välj storlek på webben.</p>",
+      "src": "",
+      "alt": "Icon",
+      "label": "Upptäck Icon",
+      "url": "https://kamadosumo.com/sv/kamado-grillar/icon/"
+    },
+    {
+      "id": "block-6",
+      "type": "product",
+      "title": "Signature",
+      "html": "<p>Detaljer i rostfritt stål och funktioner för det du vill laga. Se modellerna sida vid sida och hitta din favorit.</p>",
+      "src": "",
+      "alt": "Signature",
+      "label": "Utforska Signature",
+      "url": "https://kamadosumo.com/sv/kamado-grillar/signature/"
+    },
+    {
+      "id": "block-7",
+      "type": "product",
+      "title": "Classic",
+      "html": "<p>Ett naturligt sätt att börja med keramisk kolgrillning. Utforska storlekarna och hitta plats för dina grillkvällar.</p>",
+      "src": "",
+      "alt": "Classic",
+      "label": "Utforska Classic",
+      "url": "https://kamadosumo.com/sv/kamado-grillar/classic/"
+    },
+    {
+      "id": "block-8",
+      "type": "text",
+      "html": "<p>Osäker på storlek, modell eller tillbehör? Svara på mejlet så hjälper vi dig hitta rätt.</p>"
+    }
+  ]
+}

@@ -1,4 +1,5 @@
 "use client";
+import { FieldSelect } from "@/components/RuleBuilder";
 
 import { useCallback, useDeferredValue, useEffect, useEffectEvent, useMemo, useState, useTransition } from "react";
 import { Check, CircleAlert, Copy, FlaskConical, Loader2, MoreHorizontal, Trash2 } from "lucide-react";
@@ -7,8 +8,10 @@ import { duplicateCampaign, saveCampaign, sendTestCampaign } from "@/app/(app)/c
 import AvatarNewsletter from "@/components/AvatarNewsletter";
 import BadgeStatus from "@/components/BadgeStatus";
 import DialogDiscardCampaign from "@/components/DialogDiscardCampaign";
+import DialogEmailTemplate from "@/components/DialogEmailTemplate";
 import DialogScheduleCampaign from "@/components/DialogScheduleCampaign";
 import DialogSendCampaign from "@/components/DialogSendCampaign";
+import EditorEmailDesign from "@/components/EditorEmailDesign";
 import EditorRich from "@/components/EditorRich";
 import HeaderPage from "@/components/HeaderPage";
 import InputCampaignSlug from "@/components/InputCampaignSlug";
@@ -34,24 +37,31 @@ const UPLOADING_MESSAGE = "Wait for images to finish uploading";
 export default function FormCampaign({
 	campaign,
 	newsletter,
-	audienceCount,
+	audienceCount: totalAudienceCount,
+	segments = [],
 	isDomainVerified,
 	isSendingEnabled,
 	testEmail,
 	sendTimes,
 	archiveUrlBase,
 }) {
-	const isHtml = campaign.format === "html";
+	const [previousEmail, setPreviousEmail] = useState(null);
+	const [editorVersion, setEditorVersion] = useState(0);
 	const [isDiscardOpen, setIsDiscardOpen] = useState(false);
-	const format = isHtml ? "html" : "rich";
 	const [initialBody] = useState(() =>
 		campaign.format === "markdown" ? markdownToHtml(campaign.markdown) : campaign.html
 	);
 	const [values, setValues] = useState({
+		format: campaign.format === "html" ? "html" : "rich",
+		segmentId: campaign.segmentId || "",
 		subject: campaign.subject,
 		previewText: campaign.previewText,
 		body: initialBody,
+		design: campaign.design || null,
 	});
+	const format = values.format;
+	const isHtml = format === "html";
+	const audienceCount = values.segmentId ? (segments.find((segment) => segment._id === values.segmentId)?.count || 0) : totalAudienceCount;
 	const save = useCallback((snapshot) => saveCampaign(campaign._id, snapshot), [campaign._id]);
 	const { isDirty, isSaving, error, flush } = useAutosave(values, save);
 	const [isTesting, startTesting] = useTransition();
@@ -229,6 +239,7 @@ export default function FormCampaign({
 							</span>
 						</span>
 					</Row>
+					<Row label="Segment"><FieldSelect aria-label="Campaign audience segment" value={values.segmentId} onChange={update("segmentId")}><option value="">All active contacts</option>{segments.map((segment) => <option key={segment._id} value={segment._id}>{segment.name} ({segment.count})</option>)}</FieldSelect></Row>
 					<Row label="Subject">
 						<input
 							value={values.subject}
@@ -257,7 +268,33 @@ export default function FormCampaign({
 							/>
 						</Row>
 					)}
-					{isHtml ? (
+					<div className="flex flex-wrap gap-2 p-4">
+						<DialogEmailTemplate
+							campaign
+							newsletter={newsletter}
+							disabled={isSaving || isUploading}
+							onApply={(template) => {
+								setEditorVersion((version) => version + 1);
+								setPreviousEmail(values);
+								setValues((old) => ({ ...old, format: "html", subject: template.subject, previewText: template.previewText, body: template.html, design: template.design }));
+							}}
+						/>
+						{previousEmail && (
+							<Button type="button" variant="ghost" onClick={() => {
+								setValues((old) => ({ ...old, format: previousEmail.format, subject: previousEmail.subject, previewText: previousEmail.previewText, body: previousEmail.body, design: previousEmail.design || null }));
+								setPreviousEmail(null);
+								setEditorVersion((version) => version + 1);
+							}}>
+								Undo template
+							</Button>
+						)}
+					</div>
+					{values.design ? (
+						<div className="space-y-3 px-4 pb-5">
+							<EditorEmailDesign key={editorVersion} design={values.design} newsletter={newsletter} onChange={({ design, html }) => setValues((old) => ({ ...old, design, body: html, format: "html" }))} />
+							<p className="text-sm text-muted-foreground">Edit text, images and buttons, then drag blocks into order. Changes save automatically.</p>
+						</div>
+					) : isHtml ? (
 						<div className="relative">
 							<span className="pointer-events-none absolute top-3 right-4 text-xs text-muted-foreground">HTML</span>
 							<textarea
@@ -270,7 +307,7 @@ export default function FormCampaign({
 							/>
 						</div>
 					) : (
-						<EditorRich content={initialBody} onChange={updateBody} />
+						<EditorRich content={values.body} onChange={updateBody} />
 					)}
 				</div>
 

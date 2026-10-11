@@ -1,5 +1,10 @@
 # Mailcheap
 
+## Mailman customer automation
+
+This fork adds customer profiles, dynamic segments, abandoned cart journeys, if/else flows and a WooCommerce adapter. Read [setup, migration and operational behavior](docs/customer-automation.md). Both automation and email sending are off by default.
+
+
 Mailcheap is a self-hosted newsletter app on Amazon SES. Write an issue, send it to your list, publish it on the web. About $0.10 per 1,000 emails.
 
 ![Mailcheap overview](docs/screenshots/overview.webp)

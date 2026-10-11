@@ -1,0 +1,29 @@
+{
+  "version": 1,
+  "language": "sv",
+  "blocks": [
+    {
+      "id": "block-1",
+      "type": "heading",
+      "level": 1,
+      "kicker": "Nästa kväll vid glöden",
+      "title": "Nästa grillkväll\nbörjar här."
+    },
+    {
+      "id": "block-2",
+      "type": "text",
+      "html": "<p>Du lämnade något i varukorgen hos Kamado Sumo. Vill du fortsätta hittar du tillbaka via knappen nedan. Aktuellt lager och pris kontrolleras när du öppnar varukorgen.</p>"
+    },
+    {
+      "id": "block-3",
+      "type": "button",
+      "label": "Tillbaka till varukorgen",
+      "url": "{{checkoutUrl}}"
+    },
+    {
+      "id": "block-4",
+      "type": "text",
+      "html": "<p>Behöver du hjälp? Svara på mejlet så hjälper vi dig hitta rätt.</p>"
+    }
+  ]
+}

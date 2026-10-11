@@ -9,6 +9,10 @@ import { connectDb } from "@/lib/db";
 import { MESSAGE_STATS_GROUP } from "@/lib/message-stats";
 import { serialize } from "@/lib/serialize";
 import { listSesDomains } from "@/lib/ses";
+import { campaignAudienceQuery } from "@/lib/campaign-audience";
+import { rulesToQuery } from "@/lib/segments";
+import Segment from "@/models/Segment";
+import Suppression from "@/models/Suppression";
 import Campaign from "@/models/Campaign";
 import Contact from "@/models/Contact";
 import Message from "@/models/Message";
@@ -41,11 +45,14 @@ export default async function CampaignPage({ params }) {
 		);
 	}
 
-	const [audienceCount, domains, sendTimes] = await Promise.all([
-		Contact.countDocuments({ newsletterId: newsletter._id, status: "active" }),
+	const [audienceCount, domains, sendTimes, segments] = await Promise.all([
+		Contact.countDocuments((await campaignAudienceQuery({ newsletterId: newsletter._id })).filter),
 		listSesDomains(),
 		getSendTimes(campaign),
+		Segment.find({ newsletterId: newsletter._id }).sort({ name: 1 }).lean(),
 	]);
+	const suppressed = await Suppression.distinct("email");
+	const segmentChoices = await Promise.all(segments.map(async (segment) => ({ ...segment, count: await Contact.countDocuments({ $and: [{ newsletterId: newsletter._id, status: "active", email: { $nin: suppressed } }, rulesToQuery(segment.rules)] }) })));
 	const fromDomain = newsletter.fromEmail.split("@")[1];
 	const isDomainVerified =
 		Array.isArray(domains) && domains.some(({ domain, verified }) => domain === fromDomain && verified);
@@ -55,6 +62,7 @@ export default async function CampaignPage({ params }) {
 			campaign={serialize(campaign)}
 			newsletter={serialize(newsletter)}
 			audienceCount={audienceCount}
+			segments={serialize(segmentChoices)}
 			isDomainVerified={isDomainVerified}
 			isSendingEnabled={isSendingEnabled()}
 			testEmail={process.env.ADMIN_EMAIL}
@@ -80,7 +88,7 @@ async function getSendTimes(campaign) {
 // left after receiving it make this a little low, and the send itself skips everyone who has it.
 async function countRemaining(campaign) {
 	if (campaign.status !== "sent" || !campaign.audienceLimit) return 0;
-	const active = await Contact.countDocuments({ newsletterId: campaign.newsletterId, status: "active" });
+	const active = await Contact.countDocuments((await campaignAudienceQuery(campaign)).filter);
 	const reached = (campaign.stats?.recipients ?? 0) + (campaign.lastChance?.recipients ?? 0);
 	return Math.max(0, active - reached);
 }

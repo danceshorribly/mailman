@@ -1,0 +1,29 @@
+{
+  "version": 1,
+  "language": "en",
+  "blocks": [
+    {
+      "id": "block-1",
+      "type": "heading",
+      "level": 1,
+      "kicker": "Your next evening outdoors",
+      "title": "Your next grill\nevening starts here."
+    },
+    {
+      "id": "block-2",
+      "type": "text",
+      "html": "<p>You left something in your cart at Kamado Sumo. If you would like to continue, you can return using the button below. We will check current stock and prices when you open it.</p>"
+    },
+    {
+      "id": "block-3",
+      "type": "button",
+      "label": "Return to your cart",
+      "url": "{{checkoutUrl}}"
+    },
+    {
+      "id": "block-4",
+      "type": "text",
+      "html": "<p>Need help? Reply to this email and we will help you find the right fit.</p>"
+    }
+  ]
+}

@@ -1,0 +1,29 @@
+{
+  "version": 1,
+  "language": "en",
+  "blocks": [
+    {
+      "id": "block-1",
+      "type": "heading",
+      "level": 1,
+      "kicker": "Your next evening outdoors",
+      "title": "A question\nbefore you choose?"
+    },
+    {
+      "id": "block-2",
+      "type": "text",
+      "html": "<p>Still deciding? We are happy to help with sizes, models and accessories. Reply to this email with your questions, or return to your cart when you are ready.</p>"
+    },
+    {
+      "id": "block-3",
+      "type": "button",
+      "label": "Return to your cart",
+      "url": "{{checkoutUrl}}"
+    },
+    {
+      "id": "block-4",
+      "type": "text",
+      "html": "<p>Need help? Reply to this email and we will help you find the right fit.</p>"
+    }
+  ]
+}

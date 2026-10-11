@@ -1,0 +1,46 @@
+{
+  "version": 1,
+  "language": "sv",
+  "blocks": [
+    {
+      "id": "block-1",
+      "type": "heading",
+      "level": 1,
+      "kicker": "Välkommen till Kamado Sumo",
+      "title": "Vi ses\nkring elden."
+    },
+    {
+      "id": "block-2",
+      "type": "text",
+      "html": "<p>En ny grill på önskelistan? Eller nya idéer för den du redan har? Här hittar du inspiration, kunskap och verktyg för nästa kväll vid glöden.</p>"
+    },
+    {
+      "id": "block-3",
+      "type": "button",
+      "label": "Hitta din Sumo",
+      "url": "https://kamadosumo.com/sv/#find-your-sumo"
+    },
+    {
+      "id": "block-4",
+      "type": "image",
+      "src": "https://kamadosumo.com/wp-content/uploads/2026/02/icon-line.jpg",
+      "alt": "Kamado Sumo Icon-grillar i tre storlekar",
+      "url": "https://kamadosumo.com/sv/#find-your-sumo"
+    },
+    {
+      "id": "block-5",
+      "type": "product",
+      "title": "Har du redan en grill?",
+      "html": "<p>Börja med något du längtar efter att laga. Upptäck grilltips och hitta inspiration till din nästa middag.</p>",
+      "src": "",
+      "alt": "Har du redan en grill?",
+      "label": "Hitta din nästa idé",
+      "url": "https://kamadosumo.com/sv/posts/bbq-tips-2/"
+    },
+    {
+      "id": "block-6",
+      "type": "text",
+      "html": "<p>Osäker på storlek, modell eller tillbehör? Svara på mejlet så hjälper vi dig hitta rätt.</p>"
+    }
+  ]
+}

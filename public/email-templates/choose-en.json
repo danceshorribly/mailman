@@ -1,0 +1,66 @@
+{
+  "version": 1,
+  "language": "en",
+  "blocks": [
+    {
+      "id": "block-1",
+      "type": "heading",
+      "level": 1,
+      "kicker": "Find your Sumo",
+      "title": "Your space.\nYour grill."
+    },
+    {
+      "id": "block-2",
+      "type": "text",
+      "html": "<p>How many people usually gather around your table? What do you want to cook? And how should your outdoor space feel? Let those answers guide you towards your Sumo.</p>"
+    },
+    {
+      "id": "block-3",
+      "type": "button",
+      "label": "Compare kamado grills",
+      "url": "https://kamadosumo.com/kamado-barbecues/"
+    },
+    {
+      "id": "block-4",
+      "type": "image",
+      "src": "https://kamadosumo.com/wp-content/uploads/2026/02/icon-line.jpg",
+      "alt": "The Icon series from Kamado Sumo",
+      "url": "https://kamadosumo.com/kamado-barbecues/"
+    },
+    {
+      "id": "block-5",
+      "type": "product",
+      "title": "Icon",
+      "html": "<p>Give your grill a natural place in your outdoor space. Explore the series and choose your size on our website.</p>",
+      "src": "",
+      "alt": "Icon",
+      "label": "Discover Icon",
+      "url": "https://kamadosumo.com/kamado-grills/icon/"
+    },
+    {
+      "id": "block-6",
+      "type": "product",
+      "title": "Signature",
+      "html": "<p>Stainless steel details and features for the food you love to cook. Compare the models and find your favourite.</p>",
+      "src": "",
+      "alt": "Signature",
+      "label": "Explore Signature",
+      "url": "https://kamadosumo.com/kamado-grills/signature/"
+    },
+    {
+      "id": "block-7",
+      "type": "product",
+      "title": "Classic",
+      "html": "<p>A natural starting point for ceramic charcoal grilling. Explore the sizes and make room for your evenings by the grill.</p>",
+      "src": "",
+      "alt": "Classic",
+      "label": "Explore Classic",
+      "url": "https://kamadosumo.com/kamado-grills/classic/"
+    },
+    {
+      "id": "block-8",
+      "type": "text",
+      "html": "<p>Not sure about sizes, models or accessories? Reply to this email and we will help you find the right fit.</p>"
+    }
+  ]
+}

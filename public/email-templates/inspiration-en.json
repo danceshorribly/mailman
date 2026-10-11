@@ -1,0 +1,46 @@
+{
+  "version": 1,
+  "language": "en",
+  "blocks": [
+    {
+      "id": "block-1",
+      "type": "heading",
+      "level": 1,
+      "kicker": "Your next evening by the embers",
+      "title": "Same grill.\nFresh ideas."
+    },
+    {
+      "id": "block-2",
+      "type": "text",
+      "html": "<p>Sometimes all it takes is a new idea to reach for your grilling gloves again. Find something to cook, gather a few hungry people and turn your next dinner into an evening by the grill.</p>"
+    },
+    {
+      "id": "block-3",
+      "type": "button",
+      "label": "Explore grilling tips",
+      "url": "https://kamadosumo.com/posts/bbq-tips/"
+    },
+    {
+      "id": "block-4",
+      "type": "image",
+      "src": "https://kamadosumo.com/wp-content/uploads/2026/04/Grillmastare-22.jpg",
+      "alt": "Three cooks beside a Kamado Sumo grill",
+      "url": "https://kamadosumo.com/posts/bbq-tips/"
+    },
+    {
+      "id": "block-5",
+      "type": "product",
+      "title": "Tools for your next idea",
+      "html": "<p>Want to try pizza, cook with cast iron or improve your grilling setup? Choose accessories for what you want to cook and check that they fit your grill model.</p>",
+      "src": "",
+      "alt": "Tools for your next idea",
+      "label": "Find the right accessories",
+      "url": "https://kamadosumo.com/accessories/"
+    },
+    {
+      "id": "block-6",
+      "type": "text",
+      "html": "<p>Not sure about sizes, models or accessories? Reply to this email and we will help you find the right fit.</p>"
+    }
+  ]
+}

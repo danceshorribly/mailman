@@ -1,0 +1,46 @@
+{
+  "version": 1,
+  "language": "sv",
+  "blocks": [
+    {
+      "id": "block-1",
+      "type": "heading",
+      "level": 1,
+      "kicker": "Upptäck Icon",
+      "title": "Ge elden\nen egen plats."
+    },
+    {
+      "id": "block-2",
+      "type": "text",
+      "html": "<p>Vissa kvällar börjar med en planerad middag. Andra med att någon tänder grillen. Upptäck Icon-serien och hitta grillen du vill samla människor kring.</p>"
+    },
+    {
+      "id": "block-3",
+      "type": "button",
+      "label": "Se Icon-serien",
+      "url": "https://kamadosumo.com/sv/kamado-grillar/icon/"
+    },
+    {
+      "id": "block-4",
+      "type": "image",
+      "src": "https://kamadosumo.com/wp-content/uploads/2026/02/icon-line.jpg",
+      "alt": "Kamado Sumo Icon-grillar i tre storlekar",
+      "url": "https://kamadosumo.com/sv/kamado-grillar/icon/"
+    },
+    {
+      "id": "block-5",
+      "type": "product",
+      "title": "Välj med hela kvällen i åtanke",
+      "html": "<p>Jämför modellerna på webben, se vilka mått som passar din uteplats och fundera på vad du vill laga. Vill du ha hjälp att välja? Svara på mejlet.</p>",
+      "src": "",
+      "alt": "Välj med hela kvällen i åtanke",
+      "label": "Jämför kamadogrillarna",
+      "url": "https://kamadosumo.com/sv/kamado-grillar/"
+    },
+    {
+      "id": "block-6",
+      "type": "text",
+      "html": "<p>Osäker på storlek, modell eller tillbehör? Svara på mejlet så hjälper vi dig hitta rätt.</p>"
+    }
+  ]
+}

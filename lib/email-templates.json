@@ -1,0 +1,152 @@
+[
+  {
+    "id": "welcome-sv",
+    "name": "Välkommen",
+    "language": "sv",
+    "subject": "Välkommen till nästa grillkväll",
+    "previewText": "Grillar, inspiration och verktyg för det du vill laga.",
+    "description": "Välkomna och låta kunden välja riktning",
+    "usageNote": "Anpassa innehåll och målgrupp innan utskick.",
+    "cartOnly": false
+  },
+  {
+    "id": "choose-sv",
+    "name": "Hitta din Sumo",
+    "language": "sv",
+    "subject": "Vilken Sumo passar din uteplats?",
+    "previewText": "Upptäck Icon, Signature och Classic. Börja med hur du vill grilla.",
+    "description": "Hjälpa kunden välja grill",
+    "usageNote": "Anpassa innehåll och målgrupp innan utskick.",
+    "cartOnly": false
+  },
+  {
+    "id": "inspiration-sv",
+    "name": "Grillinspiration",
+    "language": "sv",
+    "subject": "Vad längtar du efter att lägga på grillen?",
+    "previewText": "En ny idé till middagen. Rätt verktyg när du vill prova mer.",
+    "description": "Ge en ny anledning att använda grillen och köpa relevanta tillbehör",
+    "usageNote": "Anpassa innehåll och målgrupp innan utskick.",
+    "cartOnly": false
+  },
+  {
+    "id": "owner-sv",
+    "name": "Efter grillköpet",
+    "language": "sv",
+    "subject": "När din Sumo är på plats börjar det roliga",
+    "previewText": "Hitta stöd, registrera din grill och planera nästa grillkväll.",
+    "description": "Trygg start och relevant fortsättning efter ett grillköp",
+    "usageNote": "Använd efter bekräftad leverans. En betald order bekräftar inte leverans. Välj rätt grillmodell och manual.",
+    "cartOnly": false
+  },
+  {
+    "id": "product-sv",
+    "name": "Produkt och kampanj",
+    "language": "sv",
+    "subject": "Upptäck grillen du vill samlas kring",
+    "previewText": "Se Icon-serien och hitta modellen för din uteplats.",
+    "description": "Ett tydligt produktbudskap med väg till rätt sortiment",
+    "usageNote": "Byt produkt, bild och länkar inför kampanjen. Pris, rabatt och lager hämtas inte automatiskt.",
+    "cartOnly": false
+  },
+  {
+    "id": "preferences-sv-en",
+    "name": "Välj språk / Choose language",
+    "language": "sv-en",
+    "subject": "Vilket språk vill du ha från oss? / Your preferred language?",
+    "previewText": "Välj svenska eller engelska för dina nyhetsbrev. Choose Swedish or English.",
+    "description": "Samla uttryckligt språkval utan att anta land eller medlemskap",
+    "usageNote": "Språkval kommer via svar eller e-post till info@kamadosumo.com. Uppdatera kundens språk manuellt i Mailman.",
+    "cartOnly": false
+  },
+  {
+    "id": "welcome-en",
+    "name": "Welcome",
+    "language": "en",
+    "subject": "Welcome to your next evening by the grill",
+    "previewText": "Grills, inspiration and tools for what you love to cook.",
+    "description": "Welcome subscribers and help them choose a direction",
+    "usageNote": "Adapt the content and audience before sending.",
+    "cartOnly": false
+  },
+  {
+    "id": "choose-en",
+    "name": "Find your Sumo",
+    "language": "en",
+    "subject": "Which Sumo suits your outdoor space?",
+    "previewText": "Discover Icon, Signature and Classic. Start with how you like to grill.",
+    "description": "Help customers choose a grill",
+    "usageNote": "Adapt the content and audience before sending.",
+    "cartOnly": false
+  },
+  {
+    "id": "inspiration-en",
+    "name": "Grilling inspiration",
+    "language": "en",
+    "subject": "What will you put on the grill next?",
+    "previewText": "A fresh idea for dinner. The right tools when you want to try more.",
+    "description": "Inspire another evening by the grill",
+    "usageNote": "Adapt the content and audience before sending.",
+    "cartOnly": false
+  },
+  {
+    "id": "owner-en",
+    "name": "After your grill purchase",
+    "language": "en",
+    "subject": "Your Sumo is here. Let the good evenings begin.",
+    "previewText": "Find support, register your grill and plan your next evening outdoors.",
+    "description": "Help customers get started after delivery",
+    "usageNote": "Use after confirmed delivery. A paid order does not confirm delivery. Choose the correct grill model and manual.",
+    "cartOnly": false
+  },
+  {
+    "id": "product-en",
+    "name": "Product and campaign",
+    "language": "en",
+    "subject": "Discover the grill you want to gather around",
+    "previewText": "Explore the Icon series and find the model for your outdoor space.",
+    "description": "One clear product message",
+    "usageNote": "Replace the product, image and links before the campaign. Prices, discounts and stock are not populated automatically.",
+    "cartOnly": false
+  },
+  {
+    "id": "cart-sv",
+    "name": "Övergiven varukorg",
+    "language": "sv",
+    "subject": "Fortsätt där du slutade",
+    "previewText": "Tillbaka till din varukorg när du är redo.",
+    "description": "Hjälpa kunden tillbaka till varukorgen",
+    "usageNote": "Endast för övergivna varukorgar. Produktbilder och priser fylls inte i automatiskt. Varukorgen kontrolleras före varje mejl.",
+    "cartOnly": true
+  },
+  {
+    "id": "cart-reminder-sv",
+    "name": "Varukorg, uppföljning",
+    "language": "sv",
+    "subject": "Funderar du fortfarande?",
+    "previewText": "Tillbaka till din varukorg när du är redo.",
+    "description": "Hjälpa kunden tillbaka till varukorgen",
+    "usageNote": "Endast för övergivna varukorgar. Produktbilder och priser fylls inte i automatiskt. Varukorgen kontrolleras före varje mejl.",
+    "cartOnly": true
+  },
+  {
+    "id": "cart-en",
+    "name": "Abandoned cart",
+    "language": "en",
+    "subject": "Continue where you left off",
+    "previewText": "Return to your cart when you are ready.",
+    "description": "Recover an abandoned cart",
+    "usageNote": "Only for abandoned cart flows. Product images and prices are not populated automatically. Cart eligibility is checked before each email.",
+    "cartOnly": true
+  },
+  {
+    "id": "cart-reminder-en",
+    "name": "Cart follow-up",
+    "language": "en",
+    "subject": "Still thinking it over?",
+    "previewText": "Return to your cart when you are ready.",
+    "description": "Recover an abandoned cart",
+    "usageNote": "Only for abandoned cart flows. Product images and prices are not populated automatically. Cart eligibility is checked before each email.",
+    "cartOnly": true
+  }
+]

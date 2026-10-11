@@ -15,7 +15,7 @@ export default function NavMobile({ footer }) {
 		<header className="sticky top-0 z-30 flex h-14 items-center justify-between border-b border-border/60 bg-background/80 pr-2 pl-4 backdrop-blur-md md:hidden">
 			<Link href="/" className="flex items-center gap-2">
 				<LogoMailcheap />
-				<span className="text-sm font-semibold tracking-tight">Mailcheap</span>
+				<span className="text-sm font-semibold tracking-tight">Mailman</span>
 			</Link>
 			<Sheet open={isOpen} onOpenChange={setIsOpen}>
 				<SheetTrigger asChild>

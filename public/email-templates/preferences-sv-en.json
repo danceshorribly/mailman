@@ -1,0 +1,39 @@
+{
+  "version": 1,
+  "language": "sv-en",
+  "blocks": [
+    {
+      "id": "block-1",
+      "type": "heading",
+      "level": 1,
+      "kicker": "Dina nyhetsbrev / Your newsletters",
+      "title": "Lite mer\npå ditt sätt."
+    },
+    {
+      "id": "block-2",
+      "type": "text",
+      "html": "<p>Vi vill göra våra nyhetsbrev mer relevanta för dig. Svara på mejlet och berätta om du föredrar svenska eller engelska, så uppdaterar vi ditt språkval.</p>"
+    },
+    {
+      "id": "block-3",
+      "type": "button",
+      "label": "Berätta ditt språkval / Tell us your language",
+      "url": "mailto:info@kamadosumo.com?subject=Spr%C3%A5kval%20%2F%20Language%20preference"
+    },
+    {
+      "id": "block-4",
+      "type": "product",
+      "title": "Your language. Your choice.",
+      "html": "<p><span lang=\"en\">Would you prefer Swedish or English newsletters? Reply to this email and tell us your preference. We will update it for you.</span></p>",
+      "src": "",
+      "alt": "Your language. Your choice.",
+      "label": "Tell us your language preference",
+      "url": "mailto:info@kamadosumo.com?subject=Spr%C3%A5kval%20%2F%20Language%20preference"
+    },
+    {
+      "id": "block-5",
+      "type": "text",
+      "html": "<p>Osäker på storlek, modell eller tillbehör? Svara på mejlet så hjälper vi dig hitta rätt.<br><span lang=\"en\">Questions about your grill or accessories? Reply and we will help.</span></p>"
+    }
+  ]
+}

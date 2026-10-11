@@ -1,0 +1,46 @@
+{
+  "version": 1,
+  "language": "en",
+  "blocks": [
+    {
+      "id": "block-1",
+      "type": "heading",
+      "level": 1,
+      "kicker": "Discover Icon",
+      "title": "Give the fire\na place of its own."
+    },
+    {
+      "id": "block-2",
+      "type": "text",
+      "html": "<p>Some evenings start with a planned dinner. Others start when someone lights the grill. Discover the Icon series and find the grill you want to gather people around.</p>"
+    },
+    {
+      "id": "block-3",
+      "type": "button",
+      "label": "Explore the Icon series",
+      "url": "https://kamadosumo.com/kamado-grills/icon/"
+    },
+    {
+      "id": "block-4",
+      "type": "image",
+      "src": "https://kamadosumo.com/wp-content/uploads/2026/02/icon-line.jpg",
+      "alt": "Kamado Sumo Icon grills in three sizes",
+      "url": "https://kamadosumo.com/kamado-grills/icon/"
+    },
+    {
+      "id": "block-5",
+      "type": "product",
+      "title": "Choose with the whole evening in mind",
+      "html": "<p>Compare the models online, check the dimensions for your outdoor space and think about what you want to cook. Need help choosing? Reply to this email.</p>",
+      "src": "",
+      "alt": "Choose with the whole evening in mind",
+      "label": "Compare kamado grills",
+      "url": "https://kamadosumo.com/kamado-barbecues/"
+    },
+    {
+      "id": "block-6",
+      "type": "text",
+      "html": "<p>Not sure about sizes, models or accessories? Reply to this email and we will help you find the right fit.</p>"
+    }
+  ]
+}
